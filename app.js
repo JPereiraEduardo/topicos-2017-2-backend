@@ -3,10 +3,12 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+
 var index = require('./routes/index');
 var users = require('./routes/users');
+var todos = require('./routes/todos');
 
-// Inicia os middlewares
+// Inicia os express (middlewares)
 var app = express();
 
 
@@ -17,8 +19,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// Definição dos arquivos de rotas
 app.use('/', index);
 app.use('/users', users);
+app.use('/todos',todos);
 
 // Captura os erros 404
 app.use(function(req, res, next) {
@@ -26,6 +30,8 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
+
 
 // Capturas exceptions
 app.use(function(err, req, res, next) {
