@@ -1,35 +1,33 @@
 var express = require('express');
 var path = require('path');
+var cors = require('cors');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+
 var todos = require('./routes/todos');
-
-// Inicia os express (middlewares)
+// inicia o express
 var app = express();
+app.use(cors());
 
-
-// Configura os middlewares do express
-
+// configura middlewares do express
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Definição dos arquivos de rotas
-app.use('/todos',todos);
 
-// Captura os erros 404
+
+app.use('/todos', todos);
+// captura os erro 404
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-
-
-// Capturas exceptions
+// captura exceptions
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
