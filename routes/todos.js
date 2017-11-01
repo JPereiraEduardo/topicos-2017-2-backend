@@ -63,9 +63,9 @@ todos.get('/', function (req, res, next) {
 todos.get('/:todoId', function (req, res, next) {
     console.log("Recebemos uma requisição GET");
 
-  var todo = findTodoById(req.params.todoId);
+    var todo = findTodoById(req.params.todoId);
 
-    if (todo){
+    if (todo) {
         res.status(200).json(todo);
     } else {
         res.status(404).send();
@@ -79,50 +79,85 @@ todos.post('/', function (req, res, next) {
     var todo = req.body;
     todo.id = todoIndex++;
     todo.completed = false;
-   
+
     todosList.push(todo);
 
     res.status(201).send();
 });
 
-todos.delete('/:todoId', function(req, res, next){
-    var index = todosList.findIndex(function(todo, index){
+todos.delete('/:todoId', function (req, res, next) {
+    var index = todosList.findIndex(function (todo, index) {
         return todo.id === parseInt(req.params.todoId);
     });
-if(index >= 0){
-    todosList.splice(index, 1);
-    res.status(200).send();
-}else {
-    res.status(404).send();
-}
-    
+    if (index >= 0) {
+        todosList.splice(index, 1);
+        res.status(200).send();
+    } else {
+        res.status(404).send();
+    }
 
-   
+
+
 });
-todos.put('/:todoId', function(req, res, next){
+todos.put('/:todoId', function (req, res, next) {
     var todo = findTodoById(req.params.todoId);
 
-if (todo){
-    // alteração
-    todo.title = req.body.title;
-    todo.description = req.body.description;
-    todo.completed = req.body.completed;
+    if (todo) {
+        // alteração
+        todo.title = req.body.title;
+        todo.description = req.body.description;
+        todo.completed = req.body.completed;
 
-    res.status(200).json(todo);
-}else {
-    res.status(404).send();
-}
+        res.status(200).json(todo);
+    } else {
+        res.status(404).send();
+    }
 
 
 });
-function findTodoById(todoId){
-    var todosFiltered = todosList.filter(function (todo, index){
+function findTodoById(todoId) {
+    var todosFiltered = todosList.filter(function (todo, index) {
         return todo.id === parseInt(todoId);
     });
     if (todosFiltered.length > 0)
         return todosFiltered[0];
     return null;
 }
+
+todos.put('/:todoId/completed', (req, res) => {
+    const todoId = req.params.todoId;
+    completedTodo(todoId, true, res);
+
+
+});
+
+todos.delete('/:todoId/completed', (req, res) => {
+    const todoId = req.params.todoId;
+    completedTodo(todoId, false, res);
+
+});
+
+const completedTodo = (todoId, completed, res) => {
+    const todo = { completed: completed };
+
+    Todo.update(todo, {
+        where: {
+            id: todoId
+        }
+    }).then(result => {
+        const registroAfetados = result[0];
+        if (registroAfetados > 0) {
+            res.status(204).send();
+        } else {
+            res.status(404).send();
+        }
+    }).catch(ex => {
+        console.error(ex);
+        res.status(400).send();
+    })
+
+}
+
 
 
 module.exports = todos;
